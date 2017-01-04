@@ -1,3 +1,1 @@
-第一个springboot 项目 
-可以通过访问http://localhost:8080/hello
-结果是返回Hello World
+此次是restful架构，由于post方法不好测试，所以下了个firefox插件poster
