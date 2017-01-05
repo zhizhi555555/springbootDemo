@@ -1,3 +1,6 @@
-第一个springboot 项目 
-可以通过访问http://localhost:8080/hello
-结果是返回Hello World
+freemark模板引擎
+通过pom引入 
+<dependency>
+	<groupId>org.springframework.boot</groupId>
+	<artifactId>spring-boot-starter-freemarker</artifactId>
+</dependency>
