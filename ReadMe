@@ -1,6 +1,7 @@
-freemark模板引擎
+velocity模板引擎
 通过pom引入 
 <dependency>
-	<groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-starter-freemarker</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-velocity</artifactId>
 </dependency>
+		
