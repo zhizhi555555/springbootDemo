@@ -1,7 +1,1 @@
-velocity模板引擎
-通过pom引入 
-<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-velocity</artifactId>
-</dependency>
-		
+这里要注意的地方是jdbcTemplate配置的数据库一定要自己在数据库中先建好数据库，表和字段
