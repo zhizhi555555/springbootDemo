@@ -1,16 +1,16 @@
 package melon;
 
-import melon.domain.User;
-import melon.domain.UserRepository;
-import melon.service.UserService;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.SpringApplicationConfiguration;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+
 
 
 /**
@@ -21,45 +21,39 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  *
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@SpringApplicationConfiguration(classes = FirstApplication.class)
+@SpringApplicationConfiguration(FirstApplication.class)
 public class ApplicationTest {
+
 	@Autowired
-	private UserRepository userRepository;
+	@Qualifier("primaryJdbcTemplate")
+	protected JdbcTemplate jdbcTemplate1;
+
+	@Autowired
+	@Qualifier("secondaryJdbcTemplate")
+	protected JdbcTemplate jdbcTemplate2;
+
+	@Before
+	public void setUp() {
+		jdbcTemplate1.update("DELETE  FROM  USER ");
+		jdbcTemplate2.update("DELETE  FROM  USER ");
+	}
 
 	@Test
 	public void test() throws Exception {
 
-		// 创建10条记录
-		userRepository.save(new User("AAA", 10));
-		userRepository.save(new User("BBB", 20));
-		userRepository.save(new User("CCC", 30));
-		userRepository.save(new User("DDD", 40));
-		userRepository.save(new User("EEE", 50));
-		userRepository.save(new User("FFF", 60));
-		userRepository.save(new User("GGG", 70));
-		userRepository.save(new User("HHH", 80));
-		userRepository.save(new User("III", 90));
-		userRepository.save(new User("JJJ", 100));
+		// 往第一个数据源中插入两条数据
+		jdbcTemplate1.update("insert into user(id,name,age) values(?, ?, ?)", 1, "aaa", 20);
+		jdbcTemplate1.update("insert into user(id,name,age) values(?, ?, ?)", 2, "bbb", 30);
 
-		// 测试findAll, 查询所有记录
-		Assert.assertEquals(10, userRepository.findAll().size());
+		// 往第二个数据源中插入一条数据，若插入的是第一个数据源，则会主键冲突报错
+		jdbcTemplate2.update("insert into user(id,name,age) values(?, ?, ?)", 1, "aaa", 20);
 
-		// 测试findByName, 查询姓名为FFF的User
-		Assert.assertEquals(60, userRepository.findByName("FFF").getAge().longValue());
+		// 查一下第一个数据源中是否有两条数据，验证插入是否成功
+		Assert.assertEquals("2", jdbcTemplate1.queryForObject("select count(1) from user", String.class));
 
-		// 测试findUser, 查询姓名为FFF的User
-		Assert.assertEquals(60, userRepository.findUser("FFF").getAge().longValue());
-
-		// 测试findByNameAndAge, 查询姓名为FFF并且年龄为60的User
-		Assert.assertEquals("FFF", userRepository.findByNameAndAge("FFF", 60).getName());
-
-		// 测试删除姓名为AAA的User
-		userRepository.delete(userRepository.findByName("AAA"));
-
-		// 测试findAll, 查询所有记录, 验证上面的删除是否成功
-		Assert.assertEquals(9, userRepository.findAll().size());
+		// 查一下第一个数据源中是否有两条数据，验证插入是否成功
+		Assert.assertEquals("1", jdbcTemplate2.queryForObject("select count(1) from user", String.class));
 
 	}
-
 
 }
